@@ -1,0 +1,80 @@
+﻿@using DnetOverlayComponent.Infrastructure.Enums
+@using DnetOverlayComponent.Infrastructure.Models
+@using DnetOverlayComponent.Infrastructure.Services.CssBuilder
+
+<div class="@CssClasses" style="@Styles">
+    @ContentChild
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment ContentChild { get; set; }
+
+    [Parameter]
+    public OverlayConfig OverlayConfig { get; set; }
+
+
+    public string Styles { get; set; } = null;
+
+    public string CssClasses { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CssClasses = GetOverlayCssClasses();
+        Styles = GetStyles();
+    }
+
+    private string GetOverlayCssClasses()
+    {
+
+        var classes = new CssBuilder()
+            .AddClass("cdk-global-overlay-wrapper", when: OverlayConfig.PositionStrategy == PositionStrategy.Global)
+            .AddClass("cdk-overlay-connected-position-bounding-box", when: OverlayConfig.PositionStrategy == PositionStrategy.FlexibleConnectedTo)
+            .Build();
+
+        return classes;
+    }
+
+    private string GetStyles()
+    {
+
+        var globalPositionStrategy = OverlayConfig.GlobalPositionStrategy;
+
+        var shouldBeFlushHorizontally = (OverlayConfig.Width == "100%" || OverlayConfig.Width == "100vw") &&
+                                        (string.IsNullOrEmpty(OverlayConfig.MaxWidth) || OverlayConfig.MaxWidth == "100%" || OverlayConfig.MaxWidth == "100vw");
+
+        var shouldBeFlushVertically = (OverlayConfig.Height == "100%" || OverlayConfig.Height == "100vh") &&
+                                        (string.IsNullOrEmpty(OverlayConfig.MaxHeight) || OverlayConfig.MaxHeight == "100%" || OverlayConfig.MaxHeight == "100vh");
+
+        var justifyContent = globalPositionStrategy.GetJustifyContent();
+
+        if (shouldBeFlushHorizontally)
+        {
+
+            justifyContent = "flex-start";
+
+        }
+        else if (globalPositionStrategy.GetJustifyContent() == "center")
+        {
+
+            justifyContent = "center";
+
+        }
+        else
+        {
+
+            justifyContent = globalPositionStrategy.GetJustifyContent();
+
+        }
+
+        var alignItems = shouldBeFlushVertically ? "flex-start" : globalPositionStrategy.GetAlignItems();
+
+        var styles = new StyleBuilder()
+            .AddStyle("justify-content", justifyContent)
+            .AddStyle("align-items", alignItems)
+            .Build();
+
+        return styles;
+    }
+}

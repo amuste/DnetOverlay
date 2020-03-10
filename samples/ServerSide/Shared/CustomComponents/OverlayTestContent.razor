@@ -1,0 +1,40 @@
+﻿@using DnetOverlayComponent.Infrastructure.Enums
+@using DnetOverlayComponent.Infrastructure.Interfaces
+@using DnetOverlayComponent.Infrastructure.Models
+@using DnetOverlayComponent.Infrastructure.Services
+@using ServerSide.Infrastructure.Entities
+@inject IOverlayService OverlayService
+
+    <div class="d-flex flex-column" style="width: 200px; height: 130px; background-color: #eeeeee; padding: 10px">
+        <span style="color: black; font-weight: 700; font-size: 0.75rem" class="dnet-m-b-10">Content @ComponentOptions.OverlayRef</span>
+        <input type="text" class="dnet-m-b-10"/>
+        <div class="d-flex justify-content-between">
+            <button @onclick="CloseOverlay" class="btn btn-primary" style="width: 80px; border-radius: 0">Ok</button>
+            <button @onclick="CloseOverlay" class="btn btn-primary" style="width: 80px; border-radius: 0">Close</button>
+        </div>
+    </div>
+
+@code {
+
+    [Parameter]
+    public ComponentOptions<Person> ComponentOptions {get; set; }
+
+    protected override void OnInitialized()
+    {
+        var componentOptions = ComponentOptions;
+    }
+
+    void CloseOverlay()
+    {
+        var dataResult = new OverlayResult()
+        {
+            CloseReason = CloseReason.Ok,
+            ComponentData = 10,
+            OverlayRef = ComponentOptions.OverlayRef
+
+        };
+
+        OverlayService.Detach(dataResult);
+    }
+
+}

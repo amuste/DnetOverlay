@@ -1,0 +1,113 @@
+﻿
+@using
+@using Microsoft.AspNetCore.Components.Web
+@inject IOverlayService OverlayService
+
+<div class="@OverlayCssClasses">
+
+    @if (HasBackdrop)
+    {
+        <div class="@BackdropCssClasses" @onclick="@(() => CloseOverlay())"></div>
+    }
+
+    <CascadingValue Value="this">
+        @ContenChild
+    </CascadingValue>
+
+</div>
+
+@code {
+
+    private bool _isVisible { get; set; } = false;
+
+
+    public RenderFragment ContenChild { get; set; }
+
+    public string OverlayCssClasses { get; set; }
+
+    public string BackdropCssClasses { get; set; }
+
+    public bool HasBackdrop { get; set; } = false;
+
+
+    protected override void OnInitialized()
+    {
+        OverlayCssClasses = GetOverlayCssClasses();
+
+        ((OverlayService)OverlayService).OnShow += ShowOverlay;
+        ((OverlayService)OverlayService).OnClose += CloseOverlay;
+    }
+
+    private async void ShowOverlay(RenderFragment content, OverlayConfig overlayConfig)
+    {
+        HasBackdrop = overlayConfig.HasBackdrop;
+
+        BackdropCssClasses = GetBackdropCssClasses(overlayConfig);
+
+        var pane = CreatePaneElement(content, overlayConfig);
+        var host = CreateHostElement(pane, overlayConfig);
+
+        ContenChild = host;
+
+        _isVisible = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void CloseOverlay()
+    {
+        _isVisible = false;
+        ContenChild = null;
+        HasBackdrop = false;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private RenderFragment CreatePaneElement(RenderFragment content, OverlayConfig overlayConfig)
+    {
+
+        var pane = new RenderFragment(x =>
+        {
+            x.OpenComponent(1, typeof(DnetOverlayPane));
+            x.AddAttribute(2, "ContentChild", content);
+            x.AddAttribute(3, "OverlayConfig", overlayConfig);
+            x.CloseComponent();
+        });
+
+        return pane;
+    }
+
+    private RenderFragment CreateHostElement(RenderFragment pane, OverlayConfig overlayConfig)
+    {
+
+        var host = new RenderFragment(x =>
+        {
+            x.OpenComponent(1, typeof(DnetOverlayHost));
+            x.AddAttribute(2, "ContentChild", pane);
+            x.AddAttribute(3, "OverlayConfig", overlayConfig);
+            x.CloseComponent();
+        });
+
+        return host;
+    }
+
+    private string GetOverlayCssClasses()
+    {
+
+        var classes = new CssBuilder("cdk-overlay-container")
+            .AddClass("dnet-overlay-active", when: _isVisible)
+            .Build();
+
+        return classes;
+    }
+
+    private string GetBackdropCssClasses(OverlayConfig overlayConfig)
+    {
+
+        var classes = new CssBuilder("cdk-overlay-backdrop cdk-overlay-backdrop-showing")
+            .AddClass("cdk-overlay-transparent-backdrop", when: overlayConfig.HasTransparentBackdrop)
+            .AddClass("cdk-overlay-dark-backdrop", when: !overlayConfig.HasTransparentBackdrop)
+            .Build();
+
+        return classes;
+    }
+}
