@@ -12,5 +12,7 @@ namespace DnetOverlayComponent.Infrastructure.Interfaces
         void Attach<TComponentOptions>(Type contentComponent, OverlayConfig overlayConfig, ComponentOptions<TComponentOptions> componentOptions);
 
         void Detach(OverlayResult overlayDataResult);
+
+        void BackdropClicked();
     }
 }

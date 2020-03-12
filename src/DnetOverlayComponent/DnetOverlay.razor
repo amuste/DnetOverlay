@@ -13,7 +13,7 @@
 
     @if (HasBackdrop)
     {
-        <div class="@BackdropCssClasses" @onclick="@(() => DetachOverlay(new OverlayResult {CloseReason = CloseReason.Cancel}))"></div>
+        <div class="@BackdropCssClasses" @onclick="BackdropClicked"></div>
     }
 
     <CascadingValue Value="this">
@@ -24,7 +24,11 @@
 
 @code {
 
-    private Dictionary<int, RenderFragment> _overlays { get; set; } = new Dictionary<int, RenderFragment>();
+    //private Dictionary<int, RenderFragment> _overlays { get; set; } = new Dictionary<int, RenderFragment>();
+
+    private Dictionary<int, Tuple<RenderFragment, OverlayConfig>> _overlays { get; set; } = new Dictionary<int, Tuple<RenderFragment, OverlayConfig>>();
+
+    private Stack<string> _backdrops { get; set; } = new Stack<string>();
 
 
     public RenderFragment ContenChild { get; set; }
@@ -46,14 +50,14 @@
 
     private async void AttachOverlay(RenderFragment content, OverlayConfig overlayConfig)
     {
-        HasBackdrop = overlayConfig.HasBackdrop;
-
-        BackdropCssClasses = GetBackdropCssClasses(overlayConfig);
+        if (overlayConfig.HasBackdrop) AttachBackdrop(overlayConfig);
 
         var pane = CreatePaneElement(content, overlayConfig);
         var host = CreateHostElement(pane, overlayConfig);
 
-        _overlays.Add(overlayConfig.OverlayRef, host);
+        var overlayData = new Tuple<RenderFragment, OverlayConfig>(host, overlayConfig);
+
+        _overlays.Add(overlayConfig.OverlayRef, overlayData);
 
         ContenChild = AddHostConent(_overlays);
 
@@ -62,14 +66,40 @@
 
     private async void DetachOverlay(OverlayResult overlayDataResult)
     {
-        //_isVisible = false;
-        //HasBackdrop = false;
+        var overlay = _overlays.GetValueOrDefault(overlayDataResult.OverlayRef);
+
+        if (overlay.Item2.HasBackdrop) DetachBackdrop(overlayDataResult);
 
         _overlays.Remove(overlayDataResult.OverlayRef);
 
         ContenChild = AddHostConent(_overlays);
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void AttachBackdrop(OverlayConfig overlayConfig)
+    {
+        BackdropCssClasses = GetBackdropCssClasses(overlayConfig);
+
+        _backdrops.Push(BackdropCssClasses);
+
+        HasBackdrop = true;
+    }
+
+    private void DetachBackdrop(OverlayResult overlayDataResult)
+    {
+        _backdrops.Pop();
+
+        if (_backdrops.Any())
+        {
+            var cssClasses = _backdrops.Pop();
+            _backdrops.Push(cssClasses);
+            BackdropCssClasses = cssClasses;
+        }
+        else
+        {
+            HasBackdrop = false;
+        }
     }
 
     private RenderFragment CreatePaneElement(RenderFragment content, OverlayConfig overlayConfig)
@@ -101,7 +131,7 @@
         return host;
     }
 
-    private RenderFragment AddHostConent(Dictionary<int, RenderFragment> overlays)
+    private RenderFragment AddHostConent(Dictionary<int, Tuple<RenderFragment, OverlayConfig>> overlays)
     {
 
         var content = new RenderFragment(x =>
@@ -109,7 +139,7 @@
             x.OpenElement(0, "div");
             foreach (var over in overlays)
             {
-                x.AddContent(over.Key, over.Value);
+                x.AddContent(over.Key, over.Value.Item1);
             }
             x.CloseElement();
         });
@@ -132,8 +162,14 @@
         var classes = new CssBuilder("cdk-overlay-backdrop cdk-overlay-backdrop-showing")
             .AddClass("cdk-overlay-transparent-backdrop", when: overlayConfig.HasTransparentBackdrop)
             .AddClass("cdk-overlay-dark-backdrop", when: !overlayConfig.HasTransparentBackdrop)
+            .AddClass(overlayConfig.BackdropClass, when: !string.IsNullOrEmpty(overlayConfig.BackdropClass))
             .Build();
 
         return classes;
+    }
+
+    public void BackdropClicked()
+    {
+        ((OverlayService)OverlayService).BackdropClicked();
     }
 }

@@ -1,7 +1,7 @@
 ﻿@using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services.CssBuilder
 
-<div class="cdk-overlay-pane" style="@Styles">
+<div id="cdk-overlay-@OverlayConfig.OverlayRef" class="@CssClasses" style="@Styles">
     @ContentChild
 </div>
 
@@ -15,10 +15,25 @@
 
 
     public string Styles { get; set; } = null;
+    
+    public string CssClasses { get; set; }
+
 
     protected override void OnInitialized()
     {
         Styles = GetStyles();
+        CssClasses = GetCssClasses();
+    }
+
+    private string GetCssClasses()
+    {
+
+        var classes = new CssBuilder()
+            .AddClass("cdk-overlay-pane")
+            .AddClass(OverlayConfig.PanelClass, when: !string.IsNullOrEmpty(OverlayConfig.PanelClass))
+            .Build();
+
+        return classes;
     }
 
     private string GetStyles()
@@ -43,6 +58,12 @@
             .AddStyle("margin-top", marginTop, when: !string.IsNullOrEmpty(marginTop))
             .AddStyle("margin-bottom", marginBottom, when: !string.IsNullOrEmpty(marginBottom))
             .AddStyle("margin-right", marginRight, when: !string.IsNullOrEmpty(marginRight))
+            .AddStyle("width", OverlayConfig.Width, when: !string.IsNullOrEmpty(OverlayConfig.Width))
+            .AddStyle("height", OverlayConfig.Height, when: !string.IsNullOrEmpty(OverlayConfig.Height))
+            .AddStyle("min-height", OverlayConfig.MinHeight, when: !string.IsNullOrEmpty(OverlayConfig.MinHeight))
+            .AddStyle("min-width", OverlayConfig.MinWidth, when: !string.IsNullOrEmpty(OverlayConfig.MinWidth))
+            .AddStyle("max-width", OverlayConfig.MaxWidth, when: !string.IsNullOrEmpty(OverlayConfig.MaxWidth))
+            .AddStyle("max-height", OverlayConfig.MaxHeight, when: !string.IsNullOrEmpty(OverlayConfig.MaxHeight))
             .Build();
 
         return styles;

@@ -17,6 +17,8 @@ namespace DnetOverlayComponent.Infrastructure.Services
 
         public event Action<OverlayResult> OnDetach;
 
+        public event Action OnBackdropClicked;
+
         private Type _componentType;
 
         private List<int> _sequenNumbers { get; set; } = new List<int>();
@@ -63,6 +65,11 @@ namespace DnetOverlayComponent.Infrastructure.Services
             if (!_sequenNumbers.Any()) _sequenceNumber = 1;
 
             OnDetach?.Invoke(overlayDataResult);
+        }
+
+        public void BackdropClicked()
+        {
+            OnBackdropClicked?.Invoke();
         }
     }
 }

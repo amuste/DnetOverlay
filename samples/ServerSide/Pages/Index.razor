@@ -72,6 +72,11 @@
 
     private OverlayPositioning _overlayPosition = new OverlayPositioning();
 
+    protected override void OnInitialized()
+    {
+        ((OverlayService)OverlayService).OnBackdropClicked += CloseOverlay;
+    }
+
     void ShowOverlay()
     {
 
@@ -86,11 +91,11 @@
 
         var overlayConfig = new OverlayConfig()
         {
-            HasBackdrop = false,
+            HasBackdrop = true,
             HasTransparentBackdrop = false,
             GlobalPositionStrategy = globalPositionStrategy,
-            MaxHeight = "100px",
-            MaxWidth = "100px"
+            Width = "200px",
+            Height = "130px"
         };
 
         var person = new Person()
