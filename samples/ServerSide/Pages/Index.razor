@@ -1,148 +1,64 @@
 ﻿@page "/"
+@using DnetDialogComponent.Infrastructure.Interfaces
+@using DnetDialogComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Enums
 @using DnetOverlayComponent.Infrastructure.Interfaces
 @using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services
 @using ServerSide.Infrastructure.Entities
-@using OverlayPosition = DnetOverlayComponent.Infrastructure.Enums.OverlayPosition
 
 @inject IOverlayService OverlayService
-<EditForm Model="@_overlayPosition" class="dnet-m-t-20 dnet-m-b-20">
-    <div class="d-flex flex-column">
-        <div class="d-flex flex-row dnet-m-b-20">
-            <div class="dnet-m-r-30">
-                <span>Select content positioning:</span>
-            </div>
-            <div class="dnet-m-r-20">
-                <span>Top</span>
-                <InputCheckbox id="name" @bind-Value="_overlayPosition.Top" class="coms-checkbox-no-label" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>Bottom</span>
-                <InputCheckbox id="name" @bind-Value="_overlayPosition.Bottom" class="coms-checkbox-no-label" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>Left</span>
-                <InputCheckbox id="name" @bind-Value="_overlayPosition.Left" class="coms-checkbox-no-label" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>Right</span>
-                <InputCheckbox id="name" @bind-Value="_overlayPosition.Right" class="coms-checkbox-no-label" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>CenterHorizontally</span>
-                <InputCheckbox id="name" @bind-Value="_overlayPosition.CenterHorizontally" class="coms-checkbox-no-label" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>CenterVertically</span>
-                <InputCheckbox id="name" @bind-Value="_overlayPosition.CenterVertically" class="coms-checkbox-no-label" />
-            </div>
-        </div>
-        <div class="d-flex flex-row">
-            <div class="dnet-m-r-30">
-                <span>Set content offset:</span>
-            </div>
-            <div class="dnet-m-r-20">
-                <span>TopOffset</span>
-                <InputText id="name" @bind-Value="_overlayPosition.TopOffset" class="coms-input-search" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>BottomOffset</span>
-                <InputText id="name" @bind-Value="_overlayPosition.BottomOffset" class="coms-input-search" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>LeftOffset</span>
-                <InputText id="name" @bind-Value="_overlayPosition.LeftOffset" class="coms-input-search" />
-            </div>
-            <div class="dnet-m-r-20">
-                <span>RightOffset</span>
-                <InputText id="name" @bind-Value="_overlayPosition.RightOffset" class="coms-input-search" />
-            </div>
-        </div>
-        
-    </div>
-</EditForm>
+@inject IDialogService DialogService
 
-<button @onclick="ShowOverlay" class="btn btn-primary" style="border-radius: 0">Show Content</button>
-<button @onclick="CloseOverlay" class="btn btn-primary" style="border-radius: 0">Close Content</button>
+<div class="dnet-m-l-40 dnet-m-t-40">
+    <div class="d-flex">
+        <span class="dnet-m-r-10" style="font-size: 1.5rem; font-weight: bold">Blazor DnetOverlay Component v.1.0.0</span>
+    </div>
+
+    <button @onclick="ShowDialog" class="btn btn-primary dnet-m-t-20 dnet-m-b-20" style="border-radius: 0">Show Dialog</button>
+
+    <div class="d-flex">
+        <span class="dnet-m-r-10">Result from Dialog Component:</span><span style="font-weight: bold">@_dialogData</span>
+    </div>
+</div>
+
 
 @code {
 
-    private Stack<int> _overlays { get; set; } = new Stack<int>();
+    string _dialogData;
 
-    private OverlayPositioning _overlayPosition = new OverlayPositioning();
-
-    protected override void OnInitialized()
+    void ShowDialog()
     {
-        ((OverlayService)OverlayService).OnBackdropClicked += CloseOverlay;
-    }
-
-    void ShowOverlay()
-    {
-
-        var globalPositionStrategy = new GlobalPositionStrategyBuilder();
-
-        if (_overlayPosition.Top) globalPositionStrategy.Top(_overlayPosition.TopOffset);
-        if (_overlayPosition.Bottom) globalPositionStrategy.Bottom(_overlayPosition.BottomOffset);
-        if (_overlayPosition.Left) globalPositionStrategy.Left(_overlayPosition.LeftOffset);
-        if (_overlayPosition.Right) globalPositionStrategy.Right(_overlayPosition.RightOffset);
-        if (_overlayPosition.CenterHorizontally) globalPositionStrategy.CenterHorizontally(null);
-        if (_overlayPosition.CenterVertically) globalPositionStrategy.CenterVertically(null);
-
-        var overlayConfig = new OverlayConfig()
+        var dialogConfig = new DialogConfig()
         {
+            Title = "Datalnet Modal component",
             HasBackdrop = true,
             HasTransparentBackdrop = false,
-            GlobalPositionStrategy = globalPositionStrategy,
-            Width = "200px",
-            Height = "130px"
+            Width = "600px",
+            Height = "400px"
         };
 
         var person = new Person()
         {
-            Name = "Adrian",
+            Name = "Adrián",
             LastName = "Mustelier"
         };
 
-        var componentOptions = new ComponentOptions<Person>()
-        {
-            Options = person
-        };
+        var contentData = new ContentData();
 
-        var overlayRef = OverlayService.Attach<OverlayTestContent, Person>(overlayConfig, componentOptions);
+        contentData.SetValue(person);
 
-        _overlays.Push(overlayRef);
+        var dialogReference = DialogService.Open<OverlayTestContent, Person>(dialogConfig, contentData);
 
-        ClearVars();
+        dialogReference.Close += CloseDialog;
     }
 
-    void CloseOverlay()
+    void CloseDialog(OverlayResult overlayDataResult)
     {
-        var overlayRef = _overlays.Pop();
+        _dialogData = overlayDataResult.CloseReason == CloseReason.Ok ? overlayDataResult.ComponentData.ToString() : "";
 
-        var dataResult = new OverlayResult()
-        {
-            CloseReason = CloseReason.Ok,
-            OverlayRef = overlayRef
-        };
-
-        OverlayService.Detach(dataResult);
+        InvokeAsync(StateHasChanged);
     }
-
-    private void ClearVars()
-    {
-        _overlayPosition.Top = false;
-        _overlayPosition.Bottom = false;
-        _overlayPosition.Right = false;
-        _overlayPosition.Left = false;
-        _overlayPosition.CenterVertically = false;
-        _overlayPosition.CenterHorizontally = false;
-        _overlayPosition.TopOffset = null;
-        _overlayPosition.BottomOffset = null;
-        _overlayPosition.RightOffset = null;
-        _overlayPosition.LeftOffset = null;
-    }
-
 }
 
 

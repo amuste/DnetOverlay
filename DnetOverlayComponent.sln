@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29721.120
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerSide", "samples\ServerSide\ServerSide.csproj", "{11A14ACB-46CE-4741-8049-5963E4737A23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DnetOverlayComponent", "src\DnetOverlayComponent\DnetOverlayComponent.csproj", "{427FB204-17AF-4B9E-99C6-0CB73E3A1987}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetOverlayComponent", "src\DnetOverlayComponent\DnetOverlayComponent.csproj", "{427FB204-17AF-4B9E-99C6-0CB73E3A1987}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetDialogComponent", "src\DnetDialogComponent\DnetDialogComponent.csproj", "{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{427FB204-17AF-4B9E-99C6-0CB73E3A1987}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{427FB204-17AF-4B9E-99C6-0CB73E3A1987}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{427FB204-17AF-4B9E-99C6-0CB73E3A1987}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

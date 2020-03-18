@@ -11,24 +11,24 @@
 
 <div class="@OverlayCssClasses">
 
-    @if (HasBackdrop)
+    @foreach (var backdrop in _backdrops)
     {
-        <div class="@BackdropCssClasses" @onclick="BackdropClicked"></div>
+        var (cssClasses, styles) = backdrop.Value;
+
+        <div class="@cssClasses" style="@styles" @onclick="@(e => BackdropClicked(e, backdrop.Key))"></div>
     }
 
-    <CascadingValue Value="this">
-        @ContenChild
-    </CascadingValue>
+    @ContenChild
 
 </div>
 
 @code {
 
-    //private Dictionary<int, RenderFragment> _overlays { get; set; } = new Dictionary<int, RenderFragment>();
-
     private Dictionary<int, Tuple<RenderFragment, OverlayConfig>> _overlays { get; set; } = new Dictionary<int, Tuple<RenderFragment, OverlayConfig>>();
 
-    private Stack<string> _backdrops { get; set; } = new Stack<string>();
+    private Dictionary<int, Tuple<string, string>> _backdrops { get; set; } = new Dictionary<int, Tuple<string, string>>();
+
+
 
 
     public RenderFragment ContenChild { get; set; }
@@ -46,6 +46,8 @@
 
         ((OverlayService)OverlayService).OnAttach += AttachOverlay;
         ((OverlayService)OverlayService).OnDetach += DetachOverlay;
+
+
     }
 
     private async void AttachOverlay(RenderFragment content, OverlayConfig overlayConfig)
@@ -81,25 +83,18 @@
     {
         BackdropCssClasses = GetBackdropCssClasses(overlayConfig);
 
-        _backdrops.Push(BackdropCssClasses);
+        var style = _backdrops.Any() ? "opacity: 0;" : "";
+
+        var styles = new Tuple<string, string>(BackdropCssClasses, style);
+
+        _backdrops.Add(overlayConfig.OverlayRef, styles);
 
         HasBackdrop = true;
     }
 
     private void DetachBackdrop(OverlayResult overlayDataResult)
     {
-        _backdrops.Pop();
-
-        if (_backdrops.Any())
-        {
-            var cssClasses = _backdrops.Pop();
-            _backdrops.Push(cssClasses);
-            BackdropCssClasses = cssClasses;
-        }
-        else
-        {
-            HasBackdrop = false;
-        }
+        _backdrops.Remove(overlayDataResult.OverlayRef);
     }
 
     private RenderFragment CreatePaneElement(RenderFragment content, OverlayConfig overlayConfig)
@@ -139,7 +134,9 @@
             x.OpenElement(0, "div");
             foreach (var over in overlays)
             {
-                x.AddContent(over.Key, over.Value.Item1);
+                var (overlayContent, overlayConfig) = over.Value;
+
+                x.AddContent(over.Key, overlayContent);
             }
             x.CloseElement();
         });
@@ -168,8 +165,8 @@
         return classes;
     }
 
-    public void BackdropClicked()
+    public void BackdropClicked(MouseEventArgs e, int reference)
     {
-        ((OverlayService)OverlayService).BackdropClicked();
+        OverlayService.BackdropClicked(new OverlayResult { CloseReason = CloseReason.Cancel, OverlayRef = reference });
     }
 }

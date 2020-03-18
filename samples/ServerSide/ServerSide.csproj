@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\DnetDialogComponent\DnetDialogComponent.csproj" />
     <ProjectReference Include="..\..\src\DnetOverlayComponent\DnetOverlayComponent.csproj" />
   </ItemGroup>
 

@@ -1,3 +1,4 @@
+using DnetDialogComponent.Infrastructure.Services;
 using DnetOverlayComponent.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +29,8 @@ namespace ServerSide
             services.AddHttpClient();
 
             services.AddDnetOverlay();
+
+            services.AddDialog();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

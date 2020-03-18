@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using DnetOverlayComponent.Infrastructure.Interfaces;
 using DnetOverlayComponent.Infrastructure.Models;
@@ -8,9 +7,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace DnetOverlayComponent.Infrastructure.Services
 {
-    // Credit for this service to Chris Sainty
-    // His Modal implementation point me in the right direction
-    // https://github.com/Blazored/Modal
+   
     public class OverlayService : IOverlayService
     {
         internal event Action<RenderFragment, OverlayConfig> OnAttach;
@@ -19,57 +16,52 @@ namespace DnetOverlayComponent.Infrastructure.Services
 
         public event Action OnBackdropClicked;
 
-        private Type _componentType;
+        private List<OverlayReference> _overlayReferences { get; set; } = new List<OverlayReference>();
 
-        private List<int> _sequenNumbers { get; set; } = new List<int>();
+        private int _sequenceNumber { get; set; } = 0;
 
-        private int _sequenceNumber { get; set; } = 1;
-
-        public int Attach<T, TComponentOptions>(OverlayConfig overlayConfig, ComponentOptions<TComponentOptions> componentOptions) where T : ComponentBase
+        public OverlayReference GetOverlayReference()
         {
-            _sequenNumbers.Add(_sequenceNumber);
-
-            overlayConfig.OverlayRef = _sequenceNumber;
-
             _sequenceNumber++;
 
-            Attach<TComponentOptions>(typeof(T), overlayConfig, componentOptions);
+            var overlayReference = new OverlayReference(_sequenceNumber);
 
-            return overlayConfig.OverlayRef;
+            _overlayReferences.Add(overlayReference);
+
+            return overlayReference;
         }
 
-        public void Attach<TComponentOptions>(Type contentComponent, OverlayConfig overlayConfig, ComponentOptions<TComponentOptions> componentOptions)
+        public OverlayReference Attach(RenderFragment overlayContent, OverlayConfig overlayConfig)
         {
-            if (!typeof(ComponentBase).IsAssignableFrom(contentComponent))
-            {
-                throw new ArgumentException($"{contentComponent.FullName} must be a Blazor Component");
-            }
+            _sequenceNumber++;
 
-            componentOptions.OverlayRef = overlayConfig.OverlayRef;
+            var overlayReference = new OverlayReference(_sequenceNumber);
 
-            var content = new RenderFragment(x =>
-            {
-                x.OpenComponent(0, contentComponent);
-                x.AddAttribute(1, "ComponentOptions", componentOptions);
-                x.CloseComponent();
-            });
-            _componentType = contentComponent;
+            _overlayReferences.Add(overlayReference);
 
-            OnAttach?.Invoke(content, overlayConfig);
+            overlayConfig.OverlayRef = overlayReference.OverlayReferenceId;
+
+            OnAttach?.Invoke(overlayContent, overlayConfig);
+
+            return overlayReference;
         }
 
         public void Detach(OverlayResult overlayDataResult)
         {
-            _sequenNumbers.Remove(overlayDataResult.OverlayRef);
+            var item = _overlayReferences.Find(p => p.OverlayReferenceId == overlayDataResult.OverlayRef);
 
-            if (!_sequenNumbers.Any()) _sequenceNumber = 1;
+            _overlayReferences.Remove(item);
+
+            if (!_overlayReferences.Any()) _sequenceNumber = 0;
 
             OnDetach?.Invoke(overlayDataResult);
+
+            item.CloseOverlayReference(overlayDataResult);
         }
 
-        public void BackdropClicked()
+        public void BackdropClicked(OverlayResult overlayDataResult)
         {
-            OnBackdropClicked?.Invoke();
+            Detach(overlayDataResult);
         }
     }
 }

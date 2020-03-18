@@ -1,9 +1,11 @@
 ﻿@using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services.CssBuilder
 
-<div id="cdk-overlay-@OverlayConfig.OverlayRef" class="@CssClasses" style="@Styles">
-    @ContentChild
-</div>
+    <div id="cdk-overlay-@OverlayConfig.OverlayRef" class="@CssClasses" style="@Styles">
+        <CascadingValue Value="OverlayReferenceId">
+            @ContentChild
+        </CascadingValue>
+    </div>
 
 @code {
 
@@ -14,6 +16,8 @@
     public OverlayConfig OverlayConfig { get; set; }
 
 
+    public int OverlayReferenceId { get; set; }
+
     public string Styles { get; set; } = null;
     
     public string CssClasses { get; set; }
@@ -23,6 +27,8 @@
     {
         Styles = GetStyles();
         CssClasses = GetCssClasses();
+
+        OverlayReferenceId = OverlayConfig.OverlayRef;
     }
 
     private string GetCssClasses()

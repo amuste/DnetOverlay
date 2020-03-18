@@ -1,0 +1,48 @@
+﻿@using DnetDialogComponent.Infrastructure.Interfaces
+@using DnetDialogComponent.Infrastructure.Services.CssBuilder
+@using DnetOverlayComponent.Infrastructure.Interfaces
+@inject IDialogService DialogService
+@inject IOverlayService OverlayService
+
+<div class="@DialogCssClasses">
+    <h1 class="mat-dialog-title">@Title</h1>
+    <div class="mat-dialog-content">
+        <CascadingValue Value="OverlayReferenceId">
+            @ContentChild
+        </CascadingValue>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter] private int OverlayReferenceId { get; set; }
+
+
+    [Parameter]
+    public RenderFragment ContentChild { get; set; }
+
+    [Parameter] 
+    public string Title { get; set; }
+
+    [Parameter] 
+    public string DialogClass { get; set; }
+
+
+    public string DialogCssClasses { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        DialogCssClasses = GetCssClasses();
+    }
+
+    private string GetCssClasses()
+    {
+
+        var classes = new CssBuilder("mat-dialog-container")
+            .AddClass(DialogClass, when: !string.IsNullOrEmpty(DialogClass))
+            .Build();
+
+        return classes;
+    }
+}

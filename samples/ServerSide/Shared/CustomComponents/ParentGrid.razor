@@ -1,0 +1,53 @@
+﻿@using ServerSide.Infrastructure.Entities
+@{
+    if (_allGroups.Any())
+    {
+        <div >
+            <table class="table" id="allGroups" style="width: 500px;">
+                <thead>
+                    <tr>
+                        <th scope="col">Modify</th>
+                        <th scope="col">Group Name</th>
+                        <th scope="col">Associated (#)</th>
+                        <th scope="col">Date Added</th>
+                    </tr>
+                </thead>
+                <tbody style="height: 200px; width: 100%">
+                    @foreach (var item in _allGroups)
+                    {
+                        <EditGroupItem SaveItem="@SaveItemAsync" DeleteItem="@DeleteItemAsync" GroupItem="@item" />
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code
+{
+
+    private List<GroupModel> _allGroups = new List<GroupModel>();
+
+    protected override void OnInitialized()
+    {
+        _allGroups = new List<GroupModel>()
+        {
+            new GroupModel{GroupName = "one", PasswordsAssociatedTo = "test", DateAdded = DateTime.UtcNow},
+            new GroupModel{GroupName = "two", PasswordsAssociatedTo = "test 2", DateAdded = DateTime.UtcNow.AddHours(10)}
+
+        };
+      
+    }
+
+    public void SaveItemAsync(GroupModel model)
+    {
+        var tt = model;
+    }
+
+    public void DeleteItemAsync(GroupModel model)
+    {
+
+    }
+
+
+}

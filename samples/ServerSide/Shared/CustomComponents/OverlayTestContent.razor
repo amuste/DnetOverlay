@@ -1,27 +1,43 @@
-﻿@using DnetOverlayComponent.Infrastructure.Enums
-@using DnetOverlayComponent.Infrastructure.Interfaces
+﻿@using DnetDialogComponent.Infrastructure.Interfaces
+@using DnetDialogComponent.Infrastructure.Models
+@using DnetOverlayComponent.Infrastructure.Enums
 @using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services
 @using ServerSide.Infrastructure.Entities
-@inject IOverlayService OverlayService
+@inject IDialogService DialogService
 
-    <div class="d-flex flex-column" style="background-color: #eeeeee; padding: 10px">
-        <span style="color: black; font-weight: 700; font-size: 0.75rem" class="dnet-m-b-10">Content @ComponentOptions.OverlayRef</span>
-        <input type="text" class="dnet-m-b-10"/>
-        <div class="d-flex justify-content-between">
-            <button @onclick="CloseOverlay" class="btn btn-primary" style="width: 80px; border-radius: 0">Ok</button>
-            <button @onclick="CloseOverlay" class="btn btn-primary" style="width: 80px; border-radius: 0">Close</button>
+<div class="d-flex flex-column justify-content-between" style="height: 100%">
+    <div class="d-flex flex-column">
+        <span style="color: black; font-weight: 700; font-size: 0.75rem" class="dnet-m-b-10">Content @OverlayReferenceId</span>
+        <div class="dnet-m-b-10">
+            <p>This Dialog component has been built using DnetOverlay component. DnetOverlay provides a way to open floating panels on the screen</p>
+            <span style="font-size: 0.75rem">Develop by @_person.Name @_person.LastName</span>
         </div>
+        <span>Write a result data here</span>
+        <input @bind-value="@_text" type="text" class="dnet-m-b-10 dnet-w-250" />
     </div>
+    <div class="d-flex align-items-center justify-content-end">
+        <button @onclick="CloseOverlay" class="btn btn-primary dnet-m-r-10" style="width: 80px; border-radius: 0">Ok</button>
+        <button @onclick="CancelOverlay" class="btn btn-primary dnet-m-r-10" style="width: 80px; border-radius: 0">Close</button>
+        <button @onclick="ShowDialog" class="btn btn-primary" style="border-radius: 0">Show Dialog</button>
+    </div>
+   
+</div>
 
 @code {
 
+    [CascadingParameter] private int OverlayReferenceId { get; set; }
+
     [Parameter]
-    public ComponentOptions<Person> ComponentOptions {get; set; }
+    public ContentData ContentData { get; set; }
+
+    Person _person = new Person();
+
+    string _text;
 
     protected override void OnInitialized()
     {
-        var componentOptions = ComponentOptions;
+        _person = ContentData.GetValue<Person>();
     }
 
     void CloseOverlay()
@@ -29,12 +45,48 @@
         var dataResult = new OverlayResult()
         {
             CloseReason = CloseReason.Ok,
-            ComponentData = 10,
-            OverlayRef = ComponentOptions.OverlayRef
+            ComponentData = _text ?? "10",
+            OverlayRef = OverlayReferenceId
 
         };
 
-        OverlayService.Detach(dataResult);
+        DialogService.Close(dataResult);
     }
 
+    void CancelOverlay()
+    {
+        var dataResult = new OverlayResult()
+        {
+            CloseReason = CloseReason.Cancel,
+            ComponentData = null,
+            OverlayRef = OverlayReferenceId
+
+        };
+
+        DialogService.Close(dataResult);
+    }
+
+    void ShowDialog()
+    {
+        var dialogConfig = new DialogConfig()
+        {
+            Title = "Datalnet Modal component",
+            HasBackdrop = true,
+            HasTransparentBackdrop = false,
+            Width = $"{600 + 40 * OverlayReferenceId}px",
+            Height = $"{400 + 40 * OverlayReferenceId}px"
+        };
+
+        var person = new Person()
+        {
+            Name = "Adrian",
+            LastName = "Mustelier"
+        };
+
+        var contentData = new ContentData();
+
+        contentData.SetValue(person);
+
+        DialogService.Open<OverlayTestContent, Person>(dialogConfig, contentData);
+    }
 }

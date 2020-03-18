@@ -1,0 +1,23 @@
+﻿@using ServerSide.Infrastructure.Entities
+    <tr>
+        
+        <td>
+            <button type="button" class="btn btn-sm btn-info" @onclick="(() => SaveItem.InvokeAsync(GroupItem))"><i class="fas fa-save"></i></button>
+            <button type="button" class="btn btn-sm btn-danger" @onclick="(() => DeleteItem.InvokeAsync(GroupItem))"><i class="fa fa-trash"></i></button>
+        </td>
+        <td>
+            <EditForm Model="GroupItem">
+                <InputText type="text" class="form-control" @bind-Value="@GroupItem.GroupName"></InputText>
+            </EditForm>
+        </td>
+        <td>@GroupItem.PasswordsAssociatedTo</td>
+        <td>@GroupItem.DateAdded.ToString("d")</td>
+       
+    </tr>
+
+
+@code {
+    [Parameter] public GroupModel GroupItem { get; set; }
+    [Parameter] public EventCallback<GroupModel> DeleteItem { get; set; }
+    [Parameter] public EventCallback<GroupModel> SaveItem { get; set; }
+}

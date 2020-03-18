@@ -7,12 +7,14 @@ namespace DnetOverlayComponent.Infrastructure.Interfaces
 {
     public interface IOverlayService
     {
-        int Attach<T, TComponentOptions>(OverlayConfig overlayConfig, ComponentOptions<TComponentOptions> componentOptions) where T : ComponentBase;
+        event Action OnBackdropClicked;
 
-        void Attach<TComponentOptions>(Type contentComponent, OverlayConfig overlayConfig, ComponentOptions<TComponentOptions> componentOptions);
+        OverlayReference GetOverlayReference();
+
+        OverlayReference Attach(RenderFragment overlayContent, OverlayConfig overlayConfig);
 
         void Detach(OverlayResult overlayDataResult);
 
-        void BackdropClicked();
+        void BackdropClicked(OverlayResult overlayDataResult);
     }
 }
