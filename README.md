@@ -21,8 +21,6 @@ When creating an overlay, an optional configuration object can be provided.
  };
 ```
 
-The full set of configuration options can be found in the API documentation.
-
 #### Position strategies
 The `positionStrategy` configuration option determines how the overlay will be positioned on-screen.
 There are two position strategies available as part of the library: `GlobalPositionStrategy` and
