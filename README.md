@@ -8,17 +8,17 @@ When creating an overlay, an optional configuration object can be provided.
 ```ts
  var globalPositionStrategy = new GlobalPositionStrategyBuilder();
 
-            globalPositionStrategy.CenterVertically(null);
-            globalPositionStrategy.CenterHorizontally(null);
+ globalPositionStrategy.CenterVertically(null);
+ globalPositionStrategy.CenterHorizontally(null);
 
-            var overlayConfig = new OverlayConfig()
-            {
-                HasBackdrop = dialogConfig.HasBackdrop,
-                HasTransparentBackdrop = dialogConfig.HasTransparentBackdrop,
-                Width = dialogConfig.Width,
-                Height = dialogConfig.Height,
-                GlobalPositionStrategy = globalPositionStrategy
-            };
+ var overlayConfig = new OverlayConfig()
+ {
+    HasBackdrop = dialogConfig.HasBackdrop,
+    HasTransparentBackdrop = dialogConfig.HasTransparentBackdrop,
+    Width = dialogConfig.Width,
+    Height = dialogConfig.Height,
+    GlobalPositionStrategy = globalPositionStrategy
+ };
 ```
 
 The full set of configuration options can be found in the API documentation.
