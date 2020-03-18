@@ -17,10 +17,10 @@ When creating an overlay, an optional configuration object can be provided.
 
  var overlayConfig = new OverlayConfig()
  {
-    HasBackdrop = dialogConfig.HasBackdrop,
-    HasTransparentBackdrop = dialogConfig.HasTransparentBackdrop,
-    Width = dialogConfig.Width,
-    Height = dialogConfig.Height,
+    HasBackdrop = true,
+    HasTransparentBackdrop = false,
+    Width = "600px",
+    Height = "400px",
     GlobalPositionStrategy = globalPositionStrategy
  };
 ```
