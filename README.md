@@ -1,3 +1,7 @@
+***Documentation under development***
+
+DnetOverlay v1.0.0
+
 The `DnetOverlay` package provides a way to open floating panels on the screen.
 
 ### Creating overlays
