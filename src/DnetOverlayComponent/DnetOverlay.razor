@@ -46,8 +46,6 @@
 
         ((OverlayService)OverlayService).OnAttach += AttachOverlay;
         ((OverlayService)OverlayService).OnDetach += DetachOverlay;
-
-
     }
 
     private async void AttachOverlay(RenderFragment content, OverlayConfig overlayConfig)
@@ -105,6 +103,7 @@
             x.OpenComponent(0, typeof(DnetOverlayPane));
             x.AddAttribute(1, "ContentChild", content);
             x.AddAttribute(2, "OverlayConfig", overlayConfig);
+            x.SetKey(Guid.NewGuid());
             x.CloseComponent();
         });
 
@@ -118,8 +117,8 @@
         {
             x.OpenComponent(0, typeof(DnetOverlayHost));
             x.AddAttribute(1, "ContentChild", pane);
-            x.SetKey(overlayConfig.OverlayRef);
             x.AddAttribute(2, "OverlayConfig", overlayConfig);
+            x.SetKey(overlayConfig.OverlayRef);
             x.CloseComponent();
         });
 

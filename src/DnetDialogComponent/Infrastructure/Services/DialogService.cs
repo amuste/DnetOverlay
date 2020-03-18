@@ -49,6 +49,7 @@ namespace DnetDialogComponent.Infrastructure.Services
             {
                 x.OpenComponent(0, componentType);
                 x.AddAttribute(1, "ContentData", contentData);
+                x.SetKey(Guid.NewGuid());
                 x.CloseComponent();
             });
 
@@ -56,8 +57,9 @@ namespace DnetDialogComponent.Infrastructure.Services
             {
                 x.OpenComponent(0, typeof(DnetDialog));
                 x.AddAttribute(1, "Title", dialogConfig.Title);
-                x.AddAttribute(1, "DialogClass", dialogConfig.DialogClass);
-                x.AddAttribute(1, "ContentChild", userContent);
+                x.AddAttribute(2, "DialogClass", dialogConfig.DialogClass);
+                x.AddAttribute(3, "ContentChild", userContent);
+                x.SetKey(Guid.NewGuid());
                 x.CloseComponent();
             });
 
