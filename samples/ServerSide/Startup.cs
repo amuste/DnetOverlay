@@ -28,7 +28,7 @@ namespace ServerSide
 
             services.AddHttpClient();
 
-            services.AddDnetOverlay();
+            //services.AddDnetOverlay();
 
             services.AddDialog();
         }

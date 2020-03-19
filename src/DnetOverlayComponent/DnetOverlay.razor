@@ -29,8 +29,6 @@
     private Dictionary<int, Tuple<string, string>> _backdrops { get; set; } = new Dictionary<int, Tuple<string, string>>();
 
 
-
-
     public RenderFragment ContenChild { get; set; }
 
     public string OverlayCssClasses { get; set; }
@@ -103,7 +101,7 @@
             x.OpenComponent(0, typeof(DnetOverlayPane));
             x.AddAttribute(1, "ContentChild", content);
             x.AddAttribute(2, "OverlayConfig", overlayConfig);
-            x.SetKey(Guid.NewGuid());
+            x.SetKey(overlayConfig.OverlayRef);
             x.CloseComponent();
         });
 
@@ -118,7 +116,6 @@
             x.OpenComponent(0, typeof(DnetOverlayHost));
             x.AddAttribute(1, "ContentChild", pane);
             x.AddAttribute(2, "OverlayConfig", overlayConfig);
-            x.SetKey(overlayConfig.OverlayRef);
             x.CloseComponent();
         });
 

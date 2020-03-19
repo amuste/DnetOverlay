@@ -1,4 +1,6 @@
 ﻿using DnetDialogComponent.Infrastructure.Interfaces;
+using DnetOverlayComponent.Infrastructure.Interfaces;
+using DnetOverlayComponent.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DnetDialogComponent.Infrastructure.Services
@@ -8,6 +10,8 @@ namespace DnetDialogComponent.Infrastructure.Services
         public static IServiceCollection AddDialog(this IServiceCollection services)
         {
             services.AddScoped(typeof(IDialogService), typeof(DialogService));
+
+            services.AddScoped(typeof(IOverlayService), typeof(OverlayService));
 
             return services;
         }
