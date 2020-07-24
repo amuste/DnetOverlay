@@ -1,0 +1,79 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
+
+@typeparam TItem
+
+<div @ref="_eVirtualScrollVieport"
+     class="dnet-virtual-scroll-viewport example-viewport dnet-virtual-scroll-orientation-vertical"
+     @attributes="AdditionalAttributes"
+     @onscroll="() => OnScroll()"
+     style="height: @(ContainerHeight+"px");"
+     >
+    <div class="dnet-virtual-scroll-content-wrapper" style="transform: translateY(@_transformY)">
+        @foreach (var item in _items)
+        {
+            <div class="example-item" style="height: @ItemHeight">
+                <span>@DisplayValueConverter(item)</span>
+            </div>
+        }
+    </div>
+    <div class="dnet-virtual-scroll-spacer" style="height: @_totalContentHeight;"></div>
+</div>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
+
+    [Parameter]
+    public List<TItem> Items { get; set; } = new List<TItem>();
+
+    [Parameter]
+    public Func<TItem, string> DisplayValueConverter { get; set; }
+
+    [Parameter]
+    public int ItemHeight { get; set; } = 40;
+
+    [Parameter]
+    public int ContainerHeight { get; set; } = 200;
+
+
+    private ElementReference _eVirtualScrollVieport { get; set; }
+
+    private string _totalContentHeight { get; set; }
+
+    private string _transformY { get; set; } = "0px";
+
+    private List<TItem> _items { get; set; } = new List<TItem>();
+
+
+    protected override void OnInitialized()
+    {
+        _totalContentHeight = $"{Items.Count * ItemHeight}px";
+
+        var takeItems = ContainerHeight / ItemHeight;
+
+        _items = Items.Skip(0).Take(takeItems).Select(p => p).ToList();
+    }
+
+    private async void OnScroll()
+    {
+        var scrollTop = await VirtualScrollingInterop.GetElementScrollTop(JSRuntime, _eVirtualScrollVieport);
+
+        var skipItems = (int)Math.Ceiling(scrollTop) / ItemHeight;
+
+        var takeItems = ContainerHeight / ItemHeight;
+
+        _items = Items.Skip(skipItems).Take(takeItems).Select(p => p).ToList();
+
+        var offset = ItemHeight * skipItems;
+
+        _transformY = $"{offset}px";
+
+        StateHasChanged();
+    }
+
+
+}

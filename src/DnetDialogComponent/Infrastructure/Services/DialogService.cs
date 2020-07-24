@@ -33,8 +33,8 @@ namespace DnetDialogComponent.Infrastructure.Services
 
             var globalPositionStrategy = new GlobalPositionStrategyBuilder();
 
-            globalPositionStrategy.CenterVertically(null);
-            globalPositionStrategy.CenterHorizontally(null);
+            globalPositionStrategy.CenterVertically("");
+            globalPositionStrategy.CenterHorizontally("");
 
             var overlayConfig = new OverlayConfig()
             {

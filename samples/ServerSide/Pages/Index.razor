@@ -1,41 +1,162 @@
 ﻿@page "/"
+@using System.ComponentModel.DataAnnotations
+@using System.Drawing
+@using DnetConnectedPanel.Infrastructure.Models.FilterModels
 @using DnetDialogComponent.Infrastructure.Interfaces
 @using DnetDialogComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Enums
 @using DnetOverlayComponent.Infrastructure.Interfaces
 @using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services
+@using DnetOverlayComponent.Infrastructure.Services.CssBuilder
+@using DnetToastComponent.Infrastructure.Enums
+@using DnetToastComponent.Infrastructure.Interfaces
+@using DnetToastComponent.Infrastructure.Models
+@using DnetToastComponent.Infrastructure.Services
+@using DnetTooltip.Infrastructure.Interfaces
+@using DnetTooltip.Infrastructure.Models
 @using ServerSide.Infrastructure.Entities
+@using Size = DnetOverlayComponent.Infrastructure.Models.Size
+@using DnetVirtualScrolling
+
+@inject IJSRuntime JSRuntime
+
+@inject IViewportRuler ViewportRuler
 
 @inject IOverlayService OverlayService
 @inject IDialogService DialogService
+@inject IToastService ToastService
+@inject ITooltipService TooltipService
+
+@inject DnetOverlayInterop DnetOverlayInterop
+
+@implements IDisposable
 
 <div class="dnet-m-l-40 dnet-m-t-40">
     <div class="d-flex">
-        <span class="dnet-m-r-10" style="font-size: 1.5rem; font-weight: bold">Blazor DnetOverlay Component v.1.0.0</span>
+        <span class="dnet-m-r-10" style="font-size: 1.5rem; font-weight: bold">Blazor Overlay Libraryt v.1.0.0</span>
     </div>
 
     <button @onclick="ShowDialog" class="btn btn-primary dnet-m-t-20 dnet-m-b-20" style="border-radius: 0">Show Dialog</button>
 
+    <button @onclick="ShowToast" class="btn btn-primary dnet-m-t-20 dnet-m-b-20" style="border-radius: 0">Show Toast</button>
+
+    <div class="d-flex dnet-m-b-40">
+        <span class="dnet-m-r-10">Result from Dialog Component:</span>
+        <span style="font-weight: bold">@_dialogData</span>
+    </div>
+
+    <div @ref="_tooltipTarget" style="width: 100px; height: 100px; background-color: blueviolet; position: absolute; top: 50%; left: 50%" @onmouseover="ShowTooltip" @onmouseout="HideTooltip">Hoverit</div>
+
     <div class="d-flex">
-        <span class="dnet-m-r-10">Result from Dialog Component:</span><span style="font-weight: bold">@_dialogData</span>
+        <span class="dnet-m-r-10">Click to show filter</span>
+        <DnetConnectedPanelToggle FilterData="_filterModel"></DnetConnectedPanelToggle>
+    </div>
+
+    <div class="d-flex" style="width: 450px">
+        <EditForm Model="@_formData">
+            <DataAnnotationsValidator />
+            <div class="d-flex">
+                <DnetAutoCompleteList class="form-control form-control-sm dnet-m-r-10" style="width: 250px"
+                                      Value="@_formData.FilterValue"
+                                      ValueChanged="@((string e) => MyValueChangeHandler(e))"
+                                      ValueExpression="@( () => _formData.FilterValue )"
+                                      Items="_items"
+                                      TItem="MarineOperator"
+                                      SearchValueConverter="(value) => (value.Name)"
+                                      OnItemSelected="OnAutocompleteFilter"
+                                      InputTextToUpper="true">
+                </DnetAutoCompleteList>
+                <span>@_formData.FilterValue</span>
+            </div>
+            <ValidationMessage For="@(() => _formData.FilterValue)" style="font-size: 0.675rem; color: red" />
+            <div class="d-flex dnet-m-t-15">
+                <DnetAutoCompleteList @bind-Value="@_formData1.FilterValue" class="form-control form-control-sm dnet-m-r-10" style="width: 250px"
+                                      Items="_items"
+                                      TItem="MarineOperator"
+                                      SearchValueConverter="(value) => value.Name"
+                                      CellTemplate="typeof(AutocompleteContent)"
+                                      OnItemSelected="OnAutocompleteFilter"
+                                      HasContent="true">
+                </DnetAutoCompleteList>
+                <span>@_formData1.FilterValue</span>
+            </div>
+            <ValidationMessage For="@(() => _formData1.FilterValue)" style="font-size: 0.675rem; color: red" />
+        </EditForm>
+        <DnetVirtualScrollViewport Items="_virtualScrollitems"
+                                   ItemHeight="50"
+                                   TItem="MarineOperator"
+                                   DisplayValueConverter="(value) => value.Name">
+        </DnetVirtualScrollViewport>
     </div>
 </div>
 
 
 @code {
 
+    private FilterModel _filterModel { get; set; } = new FilterModel();
+
+    private List<MarineOperator> _items = new List<MarineOperator>();
+
+    private List<MarineOperator> _virtualScrollitems = new List<MarineOperator>();
+
     string _dialogData;
+
+    private ElementReference _tooltipTarget;
+
+    private ElementReference _autocompleteInput;
+
+    private OverlayReference _tooltipReference;
+
+    private string _filterValue = "";
+
+    private FormData _formData = new FormData();
+
+    private FormData _formData1 = new FormData();
+
+    private string _autocompleteStyle = "";
+
+
+    protected override void OnInitialized()
+    {
+        _filterModel = new FilterModel
+        {
+            Column = "Name",
+            Value = "",
+            AdditionalValue = "",
+            Type = FilterType.Text,
+            Operator = FilterOperator.StartsWith,
+            AdditionalOperator = FilterOperator.EndsWith,
+            Condition = FilterCondition.And
+        };
+
+        _items = GetAutocompleteData();
+
+        _virtualScrollitems = GetVirtualScrollData();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ViewportRuler.OnResized += WindowResizedA;
+        }
+    }
+
+    void WindowResizedA(object _, Size size)
+    {
+        var tt = size;
+    }
 
     void ShowDialog()
     {
         var dialogConfig = new DialogConfig()
         {
             Title = "Datalnet Modal component",
-            HasBackdrop = false,
+            HasBackdrop = true,
             HasTransparentBackdrop = false,
-            Width = "600px",
-            Height = "400px"
+            Width = "800px",
+            Height = "800px"
         };
 
         var person = new Person()
@@ -59,6 +180,123 @@
 
         InvokeAsync(StateHasChanged);
     }
+
+
+    void ShowToast()
+    {
+        var toastConfig = new ToastConfig
+        {
+            Title = "Toast title:",
+            Text = "Data save in 10 seconds",
+            HasBackdrop = false,
+            HasTransparentBackdrop = false,
+            ToastType = ToastType.Danger,
+            ToastPostion = ToastPostion.TopRight,
+            ExcutionTime = 10,
+            ShowExcutionTime = false
+        };
+
+        ToastService.Show(toastConfig);
+    }
+
+    public void ShowTooltip()
+    {
+        var tooltipConfig = new TooltipConfig()
+        {
+            Text = "Tooltip v.1.0.0 base on Blazor Overlay Library v.1.0.0. Develop by Adrian Mustelier Camino",
+            MaxHeight = "50px",
+            MaxWidth = "400px",
+            Width = "400px",
+            Height = "50px",
+            TooltipColor = "rgba(97,97,97,1)"
+        };
+
+        _tooltipReference = TooltipService.Show(tooltipConfig, _tooltipTarget);
+    }
+
+    public void HideTooltip()
+    {
+        //ToastService.Close(new OverlayResult { OverlayRef = _tooltipReference.GetOverlayReferenceId() });
+    }
+
+    public List<MarineOperator> GetAutocompleteData()
+    {
+
+        var items = new List<MarineOperator>();
+
+        var rnd = new Random();
+
+        for (int i = 1; i < 6000; i++)
+        {
+            var item = new MarineOperator
+            {
+                MarineOperatorId = i,
+                Name = $"MarineOperator {i}",
+                Color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256))
+            };
+
+            items.Add(item);
+        }
+
+        var item1 = new MarineOperator
+        {
+            MarineOperatorId = 7000,
+            Name = null,
+            Color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256))
+        };
+
+        items.Add(item1);
+
+        return items;
+    }
+
+    public List<MarineOperator> GetVirtualScrollData()
+    {
+
+        var items = new List<MarineOperator>();
+
+        var rnd = new Random();
+
+        for (int i = 1; i < 6000; i++)
+        {
+            var item = new MarineOperator
+            {
+                MarineOperatorId = i,
+                Name = $"MarineOperator {i}",
+                Color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256))
+            };
+
+            items.Add(item);
+        }
+
+        return items;
+    }
+
+    private void OnAutocompleteFilter(MarineOperator item)
+    {
+        var value = item;
+    }
+
+    private void MyValueChangeHandler(string item)
+    {
+        _formData.FilterValue = item;
+    }
+
+    public void Dispose()
+    {
+        if (ViewportRuler != null)
+        {
+            ViewportRuler.OnResized -= WindowResizedA;
+        }
+    }
+
+    protected class FormData
+    {
+        [Required]
+        public string FilterValue { get; set; } = string.Empty;
+    }
+
 }
+
 
 

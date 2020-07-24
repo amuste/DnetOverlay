@@ -11,7 +11,7 @@ namespace DnetDialogComponent.Infrastructure.Services
         {
             services.AddScoped(typeof(IDialogService), typeof(DialogService));
 
-            services.AddScoped(typeof(IOverlayService), typeof(OverlayService));
+            services.AddTransient<IViewportRuler, ViewportRuler>();
 
             return services;
         }

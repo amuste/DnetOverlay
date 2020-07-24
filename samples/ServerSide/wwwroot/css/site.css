@@ -736,7 +736,7 @@ body {
   font-size: 12px;
   color: #38455b;
   border: 1px solid #eee;
-  padding: 2px 5px; }
+  padding: 2px 20px; }
 
 /* Base for label styling */
 [type="checkbox"].coms-checkbox-no-label:checked, [type="checkbox"].coms-checkbox-no-label:not(:checked),
@@ -797,3 +797,11 @@ body {
 [type="checkbox"].coms-checkbox-no-label:checked:after.coms-checkbox-no-label:checked:after {
   opacity: 1;
   transform: scale(1); }
+
+.example-viewport {
+  height: 200px;
+  width: 100%;
+  /*    border: 1px solid black;*/ }
+
+.example-item {
+  height: 50px; }

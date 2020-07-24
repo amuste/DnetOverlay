@@ -1,6 +1,4 @@
-﻿
-@using System.Globalization
-@using DnetOverlayComponent.Infrastructure.Enums
+﻿@using DnetOverlayComponent.Infrastructure.Enums
 @using DnetOverlayComponent.Infrastructure.Interfaces
 @using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services
@@ -9,17 +7,13 @@
 
 @inject IOverlayService OverlayService
 
-<div class="@OverlayCssClasses">
+@implements IDisposable
 
-    @foreach (var backdrop in _backdrops)
-    {
-        var (cssClasses, styles) = backdrop.Value;
-
-        <div class="@cssClasses" style="@styles" @onclick="@(e => BackdropClicked(e, backdrop.Key))"></div>
-    }
-
-    @ContenChild
-
+<div @ref="_overlayContainerRef" class="@_overlayCssClasses">
+    <CascadingValue Value="this">
+        @_contenBackDrop
+        @_contenHost
+    </CascadingValue>
 </div>
 
 @code {
@@ -29,18 +23,20 @@
     private Dictionary<int, Tuple<string, string>> _backdrops { get; set; } = new Dictionary<int, Tuple<string, string>>();
 
 
-    public RenderFragment ContenChild { get; set; }
+    private RenderFragment _contenHost { get; set; }
 
-    public string OverlayCssClasses { get; set; }
+    private RenderFragment _contenBackDrop { get; set; }
 
-    public string BackdropCssClasses { get; set; }
+    private string _overlayCssClasses { get; set; }
 
-    public bool HasBackdrop { get; set; } = false;
+    private string _backdropCssClasses { get; set; }
+
+    private ElementReference _overlayContainerRef;
 
 
     protected override void OnInitialized()
     {
-        OverlayCssClasses = GetOverlayCssClasses();
+        _overlayCssClasses = GetOverlayCssClasses();
 
         ((OverlayService)OverlayService).OnAttach += AttachOverlay;
         ((OverlayService)OverlayService).OnDetach += DetachOverlay;
@@ -48,49 +44,80 @@
 
     private async void AttachOverlay(RenderFragment content, OverlayConfig overlayConfig)
     {
-        if (overlayConfig.HasBackdrop) AttachBackdrop(overlayConfig);
+        await InvokeAsync(() =>
+        {
+            if (overlayConfig.HasBackdrop) AttachBackdrop(overlayConfig);
 
-        var pane = CreatePaneElement(content, overlayConfig);
-        var host = CreateHostElement(pane, overlayConfig);
+            var pane = CreatePaneElement(content, overlayConfig);
+            var host = CreateHostElement(pane, overlayConfig);
 
-        var overlayData = new Tuple<RenderFragment, OverlayConfig>(host, overlayConfig);
+            var overlayData = new Tuple<RenderFragment, OverlayConfig>(host, overlayConfig);
 
-        _overlays.Add(overlayConfig.OverlayRef, overlayData);
+            _overlays.Add(overlayConfig.OverlayRef, overlayData);
 
-        ContenChild = AddHostConent(_overlays);
+            _contenHost = AddHostConent(_overlays);
 
-        await InvokeAsync(StateHasChanged);
+            StateHasChanged();
+        });
     }
 
     private async void DetachOverlay(OverlayResult overlayDataResult)
     {
-        var overlay = _overlays.GetValueOrDefault(overlayDataResult.OverlayRef);
+        await InvokeAsync(() =>
+        {
+            var overlay = _overlays.GetValueOrDefault(overlayDataResult.OverlayRef);
 
-        if (overlay.Item2.HasBackdrop) DetachBackdrop(overlayDataResult);
+            if (overlay == null) return;
 
-        _overlays.Remove(overlayDataResult.OverlayRef);
+            if (overlay.Item2.HasBackdrop) DetachBackdrop(overlayDataResult);
 
-        ContenChild = AddHostConent(_overlays);
+            _overlays.Remove(overlayDataResult.OverlayRef);
 
-        await InvokeAsync(StateHasChanged);
+            _contenHost = AddHostConent(_overlays);
+
+            StateHasChanged();
+        });
     }
 
     private void AttachBackdrop(OverlayConfig overlayConfig)
     {
-        BackdropCssClasses = GetBackdropCssClasses(overlayConfig);
+        _backdropCssClasses = GetBackdropCssClasses(overlayConfig);
 
-        var style = _backdrops.Any() ? "opacity: 0;" : "";
+        var bdStyle = overlayConfig.BackdropZindex != null ? $"opacity: 0; z-index: {overlayConfig.BackdropZindex}" : "opacity: 0;";
 
-        var styles = new Tuple<string, string>(BackdropCssClasses, style);
+        var style = _backdrops.Any() ? bdStyle : "";
+
+        var styles = new Tuple<string, string>(_backdropCssClasses, style);
 
         _backdrops.Add(overlayConfig.OverlayRef, styles);
 
-        HasBackdrop = true;
+        _contenBackDrop = CreateBackdrops();
     }
 
     private void DetachBackdrop(OverlayResult overlayDataResult)
     {
         _backdrops.Remove(overlayDataResult.OverlayRef);
+
+        _contenBackDrop = CreateBackdrops();
+    }
+
+    private RenderFragment CreateBackdrops()
+    {
+
+        var backdrops = new RenderFragment(x =>
+        {
+            foreach (var backdrop in _backdrops)
+            {
+                var s = -1;
+                x.OpenElement(s++, "div");
+                x.AddAttribute(s++, "style", backdrop.Value.Item2);
+                x.AddAttribute(s++, "class", backdrop.Value.Item1);
+                x.AddAttribute(s++, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, e => BackdropClicked(e, backdrop.Key)));
+                x.CloseElement();
+            }
+        });
+
+        return backdrops;
     }
 
     private RenderFragment CreatePaneElement(RenderFragment content, OverlayConfig overlayConfig)
@@ -98,10 +125,10 @@
 
         var pane = new RenderFragment(x =>
         {
-            x.OpenComponent(0, typeof(DnetOverlayPane));
-            x.AddAttribute(1, "ContentChild", content);
-            x.AddAttribute(2, "OverlayConfig", overlayConfig);
-            x.SetKey(overlayConfig.OverlayRef);
+            var s = -1;
+            x.OpenComponent(s++, typeof(DnetOverlayPane));
+            x.AddAttribute(s++, "ContentChild", content);
+            x.AddAttribute(s++, "OverlayConfig", overlayConfig);
             x.CloseComponent();
         });
 
@@ -113,9 +140,10 @@
 
         var host = new RenderFragment(x =>
         {
-            x.OpenComponent(0, typeof(DnetOverlayHost));
-            x.AddAttribute(1, "ContentChild", pane);
-            x.AddAttribute(2, "OverlayConfig", overlayConfig);
+            var s = -1;
+            x.OpenComponent(s++, typeof(DnetOverlayHost));
+            x.AddAttribute(s++, "ContentChild", pane);
+            x.AddAttribute(s++, "OverlayConfig", overlayConfig);
             x.CloseComponent();
         });
 
@@ -128,11 +156,14 @@
         var content = new RenderFragment(x =>
         {
             x.OpenElement(0, "div");
-            foreach (var over in overlays)
+
+            var orderedOverlays = overlays.OrderBy(p => p.Key);
+
+            foreach (var over in orderedOverlays)
             {
                 var (overlayContent, overlayConfig) = over.Value;
 
-                x.AddContent(over.Key, overlayContent);
+                x.AddContent(overlayConfig.OverlayRef, overlayContent);
             }
             x.CloseElement();
         });
@@ -164,5 +195,16 @@
     public void BackdropClicked(MouseEventArgs e, int reference)
     {
         OverlayService.BackdropClicked(new OverlayResult { CloseReason = CloseReason.Cancel, OverlayRef = reference });
+    }
+
+    public ElementReference GeElementReference()
+    {
+        return _overlayContainerRef;
+    }
+
+    public void Dispose()
+    {
+        ((OverlayService)OverlayService).OnAttach -= AttachOverlay;
+        ((OverlayService)OverlayService).OnDetach -= DetachOverlay;
     }
 }

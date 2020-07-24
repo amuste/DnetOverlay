@@ -9,15 +9,19 @@ namespace DnetOverlayComponent.Infrastructure.Models
 
         public string PanelClass { get; set; } = null;
 
+        public int? PanelZindex { get; set; } = null;
+
         public bool HasBackdrop { get; set; } = true;
+
+        public int? BackdropZindex { get; set; } = null;
 
         public bool HasTransparentBackdrop { get; set; }
 
         public string BackdropClass { get; set; } = null;
 
-        public string Width { get; set; } = "100%";
+        public string Width { get; set; } = null;
 
-        public string Height { get; set; } = "100%";
+        public string Height { get; set; } = null;
 
         public string MinWidth { get; set; } = null;
 

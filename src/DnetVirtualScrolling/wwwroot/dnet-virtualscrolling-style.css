@@ -1,0 +1,64 @@
+﻿:root {
+  --dnet-tooltip-horizontal-padding: 8px;
+  --dnet-tooltip-max-width: 250px;
+  --dnet-tooltip-margin: 14px;
+  --dnet-tooltip-handset-horizontal-padding: 16px;
+  --dnet-tooltip-handset-margin: 24px;
+  --dnet-tooltip-border-radius: 0px; }
+
+.dnet-virtual-scroll-viewport {
+  display: block;
+  position: relative;
+  overflow: auto;
+  contain: strict;
+  transform: translateZ(0);
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch; }
+
+/**Wrapper element for the rendered content. This element will be transformed to push the rendered
+ content to its correct offset in the data set as a whole.**/
+.dnet-virtual-scroll-content-wrapper {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  contain: content; }
+
+.dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper {
+  min-height: 100%; }
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > dl:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > ol:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > table:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > ul:not([cdkVirtualFor]) {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    outline: none; }
+
+.dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper {
+  min-width: 100%; }
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > dl:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > ol:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > table:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > ul:not([cdkVirtualFor]) {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    outline: none; }
+
+.dnet-virtual-scroll-spacer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 1px;
+  transform-origin: 0 0; }
+  [dir='rtl'] .dnet-virtual-scroll-spacer {
+    right: 0;
+    left: auto;
+    transform-origin: 100% 0; }

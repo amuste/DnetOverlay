@@ -9,6 +9,10 @@ namespace DnetOverlayComponent.Infrastructure.Services
         {
             services.AddScoped(typeof(IOverlayService), typeof(OverlayService));
 
+            services.AddTransient<IViewportRuler, ViewportRuler>();
+
+            services.AddTransient<DnetOverlayInterop, DnetOverlayInterop>();
+
             return services;
         }
     }

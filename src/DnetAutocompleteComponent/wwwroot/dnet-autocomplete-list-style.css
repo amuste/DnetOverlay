@@ -1,0 +1,143 @@
+﻿:root {
+  --dnet-autoc-input-padding-lef: 35px;
+  --dnet-autoc-input-border: 1px solid #eee;
+  --dnet-autoc-input-border-radius: 0px;
+  --dnet-autoc-input-conten-wrapper-width: 30px;
+  --dnet-autoc-input-conten-wrapper-height: 30px;
+  --dnet-autoc-content-text-margin: 5px;
+  --dnet-auto-hover-color: rgba(0, 0, 0, 0.04);
+  --dnet-auto-item-height: 40px; }
+
+.dnet-autoc-menu-container {
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 1px 10px 0 rgba(0, 0, 0, 0.1);
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  cursor: pointer;
+  /*    padding: 15px 10px;*/ }
+
+.dnet-autoc-menu-container-filter-wrapper {
+  width: 100%;
+  text-overflow: ellipsis; }
+
+.dnet-autoc-input-autocomplete {
+  width: 100%;
+  border-radius: var(--dnet-autoc-input-border-radius);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: #FFFFFF;
+  -webkit-transition: none;
+  transition: none;
+  box-shadow: none;
+  color: #38455b;
+  border: var(--dnet-autoc-input-border);
+  padding: 2px 5px; }
+  .dnet-autoc-input-autocomplete.padding-left {
+    padding-left: var(--dnet-autoc-input-padding-lef); }
+
+.dnet-autoc-input-content-wrapper {
+  width: var(--dnet-autoc-input-conten-wrapper-width);
+  height: var(--dnet-autoc-input-conten-wrapper-height);
+  position: absolute;
+  top: 0px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+  .dnet-autoc-input-content-wrapper.hide {
+    display: none; }
+
+.dnet-autoc-content-wrapper {
+  display: flex;
+  align-items: center; }
+
+.dnet-autoc-content-text {
+  display: block; }
+  .dnet-autoc-content-text.has-content {
+    margin-left: var(--dnet-autoc-content-text-margin); }
+
+.dnet-autoc-menu-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  line-height: var(--dnet-auto-item-height);
+  height: var(--dnet-auto-item-height);
+  padding: 0 12px;
+  text-align: left;
+  text-decoration: none;
+  max-width: 100%;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent; }
+  .dnet-autoc-menu-item:hover {
+    background-color: var(--dnet-auto-hover-color);
+    cursor: pointer; }
+
+.dnet-virtual-scroll-viewport {
+  display: block;
+  position: relative;
+  overflow: auto;
+  contain: strict;
+  transform: translateZ(0);
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch; }
+
+/**Wrapper element for the rendered content. This element will be transformed to push the rendered
+ content to its correct offset in the data set as a whole.**/
+.dnet-virtual-scroll-content-wrapper {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  contain: content; }
+
+.dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper {
+  min-height: 100%; }
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > dl:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > ol:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > table:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-horizontal .dnet-virtual-scroll-content-wrapper > ul:not([cdkVirtualFor]) {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    outline: none; }
+
+.dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper {
+  min-width: 100%; }
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > dl:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > ol:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > table:not([cdkVirtualFor]),
+  .dnet-virtual-scroll-orientation-vertical .dnet-virtual-scroll-content-wrapper > ul:not([cdkVirtualFor]) {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    outline: none; }
+
+.dnet-virtual-scroll-spacer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 1px;
+  transform-origin: 0 0; }
+  [dir='rtl'] .dnet-virtual-scroll-spacer {
+    right: 0;
+    left: auto;
+    transform-origin: 100% 0; }

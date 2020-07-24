@@ -1,14 +1,22 @@
 ﻿@using DnetDialogComponent.Infrastructure.Interfaces
 @using DnetDialogComponent.Infrastructure.Services.CssBuilder
 @using DnetOverlayComponent.Infrastructure.Interfaces
+@using DnetOverlayComponent.Infrastructure.Services
+@using Microsoft.AspNetCore.Components.Web
+
 @inject IDialogService DialogService
 @inject IOverlayService OverlayService
 
 <div class="@DialogCssClasses">
-    <h1 class="mat-dialog-title">@Title</h1>
-    <div class="mat-dialog-content">
+    <div class="dnet-dialog-header">
+        <h1 class="dnet-dialog-title">@Title</h1>
+        <span @onclick="CloseDialog" class="dnet-dialog-icon-wrapper">
+            <span class="dnet-dialog-icon dnet-dialog-close-icon" unselectable="on"></span>
+        </span>
+    </div>
+    <div class="dnet-dialog-content">
         <CascadingValue Value="OverlayReferenceId">
-            @ContentChild
+            @_contentChild
         </CascadingValue>
     </div>
 </div>
@@ -21,28 +29,37 @@
     [Parameter]
     public RenderFragment ContentChild { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public string Title { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public string DialogClass { get; set; }
 
 
     public string DialogCssClasses { get; set; }
 
 
+    private RenderFragment _contentChild { get; set; }
+
+
     protected override void OnInitialized()
     {
         DialogCssClasses = GetCssClasses();
+        _contentChild = ContentChild;
     }
 
     private string GetCssClasses()
     {
 
-        var classes = new CssBuilder("mat-dialog-container")
+        var classes = new CssBuilder("dnet-dialog-container")
             .AddClass(DialogClass, when: !string.IsNullOrEmpty(DialogClass))
             .Build();
 
         return classes;
+    }
+
+    public void CloseDialog()
+    {
+        DialogService.Close(new OverlayResult { OverlayRef = OverlayReferenceId });
     }
 }

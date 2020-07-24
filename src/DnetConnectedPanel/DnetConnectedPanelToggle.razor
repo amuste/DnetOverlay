@@ -1,0 +1,135 @@
+﻿@using DnetConnectedPanel.Infrastructure.Models.FilterModels
+@using DnetOverlayComponent.Infrastructure.Enums
+@using Microsoft.AspNetCore.Components.Web
+@using DnetOverlayComponent.Infrastructure.Interfaces
+@using DnetOverlayComponent.Infrastructure.Models
+@using DnetOverlayComponent.Infrastructure.Services
+@using Microsoft.JSInterop
+
+@implements IDisposable
+
+@inject IJSRuntime JSRuntime
+
+@inject IOverlayService OverlayService
+
+@inject DnetOverlayInterop DnetOverlayInterop
+
+<svg @ref="_menuTrigger" @onclick="ToggleMenu" class="bi bi-filter" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" />
+</svg>
+
+@code {
+
+    [Parameter]
+    public FilterModel FilterData { get; set; }
+
+
+    private ElementReference _menuTrigger;
+
+    private bool _isOpen = false;
+
+    private OverlayReference _menuReference;
+
+
+    private async Task ToggleMenu()
+    {
+        if (!_isOpen)
+        {
+            await AttachMenu();
+        }
+        else
+        {
+            DetachMenu();
+        }
+
+        _isOpen = !_isOpen;
+    }
+
+
+    private async Task AttachMenu()
+    {
+
+        var origin = await DnetOverlayInterop.GetBoundingClientRect(_menuTrigger);
+
+        var positions = new List<ConnectedPosition>
+{
+            new ConnectedPosition
+            {
+                OriginX = HorizontalConnectionPos.Start,
+                OriginY = VerticalConnectionPos.Bottom,
+                OverlayX = HorizontalConnectionPos.Start,
+                OverlayY = VerticalConnectionPos.Top
+            },
+            new ConnectedPosition
+            {
+                OriginX = HorizontalConnectionPos.Start,
+                OriginY = VerticalConnectionPos.Top,
+                OverlayX = HorizontalConnectionPos.Start,
+                OverlayY = VerticalConnectionPos.Bottom
+            },
+            new ConnectedPosition
+            {
+                OriginX = HorizontalConnectionPos.End,
+                OriginY = VerticalConnectionPos.Bottom,
+                OverlayX = HorizontalConnectionPos.End,
+                OverlayY = VerticalConnectionPos.Top
+            },
+            new ConnectedPosition
+            {
+                OriginX = HorizontalConnectionPos.End,
+                OriginY = VerticalConnectionPos.Top,
+                OverlayX = HorizontalConnectionPos.End,
+                OverlayY = VerticalConnectionPos.Bottom
+            }
+        };
+
+        var flexibleConnectedPositionStrategyBuilder = new FlexibleConnectedPositionStrategyBuilder().WithLockedPosition()
+        .WithViewportMargin(8)
+        .SetOrigin(_menuTrigger)
+        .WithFlexibleDimensions(false)
+        .WithPositions(positions);
+
+        var connectedPanelConfig = new OverlayConfig()
+        {
+            HasBackdrop = true,
+            HasTransparentBackdrop = true,
+            PositionStrategy = PositionStrategy.FlexibleConnectedTo,
+            FlexibleConnectedPositionStrategyBuilder = flexibleConnectedPositionStrategyBuilder
+        };
+
+        var menuContent = new RenderFragment(x =>
+        {
+            x.OpenComponent(0, typeof(DnetConnectedFloatingPanel));
+            x.AddAttribute(1, "FilterData", FilterData);
+            x.CloseComponent();
+        });
+
+        _menuReference = OverlayService.Attach(menuContent, connectedPanelConfig);
+
+        _menuReference.Close += CloseDialog;
+    }
+
+    private void DetachMenu()
+    {
+        _isOpen = false;
+
+        var result = new OverlayResult
+        {
+            OverlayRef = _menuReference.GetOverlayReferenceId(),
+            CloseReason = CloseReason.Cancel
+        };
+
+        OverlayService.Detach(result);
+    }
+
+    void CloseDialog(OverlayResult overlayDataResult)
+    {
+        _isOpen = false;
+    }
+
+    public void Dispose()
+    {
+        if (_menuReference != null) _menuReference.Close -= CloseDialog;
+    }
+
+}

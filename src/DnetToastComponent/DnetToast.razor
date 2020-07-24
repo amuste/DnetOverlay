@@ -1,0 +1,175 @@
+﻿@using System.Timers
+@using DnetOverlayComponent.Infrastructure.Services
+@using DnetToastComponent.Infrastructure.Enums
+@using DnetToastComponent.Infrastructure.Interfaces
+@using DnetToastComponent.Infrastructure.Services.CssBuilder
+@using Microsoft.AspNetCore.Components.Web
+@inject IToastService ToastService
+
+@implements IDisposable
+
+<div class="@_toastCssClasses">
+    <div class="dnet-toast-left-column">
+        <span class="dnet-toast-icon-wrapper">
+            <span class="dnet-toast-icon @_typeIconClass" unselectable="on"></span>
+        </span>
+    </div>
+    <div class="dnet-toast-center-column">
+        <span class="dnet-toast-title">@Title @OverlayReferenceId</span>
+        <span class="dnet-toast-text">@Text</span>
+        <CascadingValue Value="OverlayReferenceId">
+            @ContentChild
+        </CascadingValue>
+    </div>
+    <div class="dnet-toast-right-column">
+        <span @onclick="CloseToast" class="dnet-toast-icon-wrapper">
+            <span class="dnet-toast-icon @_closeIconClass" unselectable="on"></span>
+        </span>
+        @if (ShowExcutionTime)
+        {
+            <span class="dnet-toast-counter">
+                @_excutionTime
+            </span>
+        }
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter] private int OverlayReferenceId { get; set; }
+
+
+    [Parameter]
+    public RenderFragment ContentChild { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public ToastType ToastType { get; set; }
+
+    [Parameter]
+    public string TypeIconClass { get; set; }
+
+    [Parameter]
+    public string ToastTypeIconClass { get; set; }
+
+    [Parameter]
+    public string CloseIconClass { get; set; }
+
+    [Parameter]
+    public string ToastTypeColor { get; set; }
+
+    [Parameter]
+    public string ToastClass { get; set; }
+
+    [Parameter]
+    public int ExcutionTime { get; set; }
+
+    [Parameter]
+    public bool ShowExcutionTime { get; set; }
+
+
+    private string _toastCssClasses { get; set; }
+
+    private string _backgroundColor { get; set; }
+
+    private string _typeIconClass { get; set; }
+
+    private string _closeIconClass { get; set; }
+
+    private Timer _timer;
+
+    private int _excutionTime = 0;
+
+
+    protected override void OnInitialized()
+    {
+        _excutionTime = ExcutionTime;
+
+        _timer = new Timer { Interval = 1000 };
+
+        _timer.Elapsed += OnOperationFinish;
+
+        _timer.AutoReset = false;
+
+        _toastCssClasses = GetCssClasses();
+
+        switch (ToastType)
+        {
+            case ToastType.Success:
+                _typeIconClass = "dnet-toast-success-icon";
+                break;
+            case ToastType.Information:
+                _typeIconClass = "dnet-toast-info-icon";
+                break;
+            case ToastType.Warning:
+                _typeIconClass = "dnet-toast-warning-icon";
+                break;
+            case ToastType.Danger:
+                _typeIconClass = "dnet-toast-danger-icon";
+                break;
+        }
+
+        _closeIconClass = !string.IsNullOrEmpty(CloseIconClass) ? CloseIconClass : "dnet-toast-close-icon";
+
+        if (!string.IsNullOrEmpty(TypeIconClass)) _typeIconClass = TypeIconClass;
+
+        if (!string.IsNullOrEmpty(ToastTypeColor))
+        {
+            _backgroundColor = ToastTypeColor;
+        }
+
+        _timer.Start();
+    }
+
+    private string GetCssClasses()
+    {
+
+        var classes = new CssBuilder("dnet-toast-container")
+            .AddClass("success", when: ToastType == ToastType.Success)
+            .AddClass("info", when: ToastType == ToastType.Information)
+            .AddClass("warning", when: ToastType == ToastType.Warning)
+            .AddClass("danger", when: ToastType == ToastType.Danger)
+            .Build();
+
+        return classes;
+    }
+
+    public void CloseToast()
+    {
+        _timer.Stop();
+
+        ToastService.Close(new OverlayResult { OverlayRef = OverlayReferenceId });
+    }
+
+    private async void OnOperationFinish(Object source, ElapsedEventArgs e)
+    {
+        await InvokeAsync(() =>
+        {
+            _excutionTime--;
+
+            _timer.Interval = 1000;
+
+            StateHasChanged();
+
+            if (_excutionTime > 0) return;
+
+            _timer.Stop();
+
+            _timer.Elapsed -= OnOperationFinish;
+
+            ToastService.Close(new OverlayResult { OverlayRef = OverlayReferenceId });
+        });
+
+    }
+
+    public void Dispose()
+    {
+        _timer.Elapsed -= OnOperationFinish;
+        _timer.Dispose();
+    }
+}

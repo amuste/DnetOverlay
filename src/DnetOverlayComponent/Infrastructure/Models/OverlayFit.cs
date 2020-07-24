@@ -8,6 +8,6 @@
 
         public bool FitsInViewportHorizontally { get; set; }
 
-        public double VisibleArea { get; set; }
+        public double? VisibleArea { get; set; }
     }
 }

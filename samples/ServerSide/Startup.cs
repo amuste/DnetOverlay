@@ -1,11 +1,14 @@
+using DnetAutocompleteComponent.Infrastructure.Services;
+using DnetConnectedPanel.Infrastructure.Services;
 using DnetDialogComponent.Infrastructure.Services;
 using DnetOverlayComponent.Infrastructure.Services;
+using DnetToastComponent.Infrastructure.Services;
+using DnetTooltip.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ServerSide.Infrastructure.Entities;
 
 namespace ServerSide
 {
@@ -28,9 +31,17 @@ namespace ServerSide
 
             services.AddHttpClient();
 
-            //services.AddDnetOverlay();
+            services.AddDnetOverlay();
 
             services.AddDialog();
+
+            services.AddDnetConnectedPanel();
+
+            services.AddAutocompleteList();
+
+            services.AddDnetToast();
+
+            services.AddTooltip();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

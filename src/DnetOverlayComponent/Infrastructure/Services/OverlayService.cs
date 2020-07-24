@@ -10,7 +10,7 @@ namespace DnetOverlayComponent.Infrastructure.Services
    
     public class OverlayService : IOverlayService
     {
-        internal event Action<RenderFragment, OverlayConfig> OnAttach;
+        public event Action<RenderFragment, OverlayConfig> OnAttach;
 
         public event Action<OverlayResult> OnDetach;
 
@@ -49,6 +49,8 @@ namespace DnetOverlayComponent.Infrastructure.Services
         public void Detach(OverlayResult overlayDataResult)
         {
             var item = _overlayReferences.Find(p => p.OverlayReferenceId == overlayDataResult.OverlayRef);
+
+            if(item == null) return;
 
             _overlayReferences.Remove(item);
 
