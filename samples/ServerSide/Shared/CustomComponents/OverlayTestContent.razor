@@ -19,19 +19,6 @@
         <input @bind-value="@_text" type="text" class="dnet-m-b-10 dnet-w-250" />
     </div>
     <div class="d-flex">
-        <EditForm Model="@_formData">
-            <DnetAutoCompleteList class="form-control form-control-sm dnet-m-r-10" style="width: 250px"
-                                  Value="@_formData.FilterValue"
-                                  ValueChanged="@((string e) => MyValueChangeHandler(e))"
-                                  ValueExpression="@( () => _formData.FilterValue )"
-                                  MaxHeight="200px"
-                                  Items="_items"
-                                  TItem="MarineOperator"
-                                  SearchValueConverter="(value) => (value.Name)"
-                                  OnItemSelected="OnAutocompleteFilter">
-            </DnetAutoCompleteList>
-            <span>@_formData.FilterValue</span>
-        </EditForm>
     </div>
     <div class="d-flex align-items-center justify-content-end">
         <button @onclick="CloseOverlay" class="btn btn-primary dnet-m-r-10" style="width: 80px; border-radius: 0">Ok</button>

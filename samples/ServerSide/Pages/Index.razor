@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
 @using System.Drawing
-@using DnetConnectedPanel.Infrastructure.Models.FilterModels
 @using DnetDialogComponent.Infrastructure.Interfaces
 @using DnetDialogComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Enums
@@ -9,15 +8,8 @@
 @using DnetOverlayComponent.Infrastructure.Models
 @using DnetOverlayComponent.Infrastructure.Services
 @using DnetOverlayComponent.Infrastructure.Services.CssBuilder
-@using DnetToastComponent.Infrastructure.Enums
-@using DnetToastComponent.Infrastructure.Interfaces
-@using DnetToastComponent.Infrastructure.Models
-@using DnetToastComponent.Infrastructure.Services
-@using DnetTooltip.Infrastructure.Interfaces
-@using DnetTooltip.Infrastructure.Models
 @using ServerSide.Infrastructure.Entities
 @using Size = DnetOverlayComponent.Infrastructure.Models.Size
-@using DnetVirtualScrolling
 
 @inject IJSRuntime JSRuntime
 
@@ -25,8 +17,6 @@
 
 @inject IOverlayService OverlayService
 @inject IDialogService DialogService
-@inject IToastService ToastService
-@inject ITooltipService TooltipService
 
 @inject DnetOverlayInterop DnetOverlayInterop
 
@@ -39,62 +29,15 @@
 
     <button @onclick="ShowDialog" class="btn btn-primary dnet-m-t-20 dnet-m-b-20" style="border-radius: 0">Show Dialog</button>
 
-    <button @onclick="ShowToast" class="btn btn-primary dnet-m-t-20 dnet-m-b-20" style="border-radius: 0">Show Toast</button>
-
     <div class="d-flex dnet-m-b-40">
         <span class="dnet-m-r-10">Result from Dialog Component:</span>
         <span style="font-weight: bold">@_dialogData</span>
-    </div>
-
-    <div @ref="_tooltipTarget" style="width: 100px; height: 100px; background-color: blueviolet; position: absolute; top: 50%; left: 50%" @onmouseover="ShowTooltip" @onmouseout="HideTooltip">Hoverit</div>
-
-    <div class="d-flex">
-        <span class="dnet-m-r-10">Click to show filter</span>
-        <DnetConnectedPanelToggle FilterData="_filterModel"></DnetConnectedPanelToggle>
-    </div>
-
-    <div class="d-flex" style="width: 450px">
-        <EditForm Model="@_formData">
-            <DataAnnotationsValidator />
-            <div class="d-flex">
-                <DnetAutoCompleteList class="form-control form-control-sm dnet-m-r-10" style="width: 250px"
-                                      Value="@_formData.FilterValue"
-                                      ValueChanged="@((string e) => MyValueChangeHandler(e))"
-                                      ValueExpression="@( () => _formData.FilterValue )"
-                                      Items="_items"
-                                      TItem="MarineOperator"
-                                      SearchValueConverter="(value) => (value.Name)"
-                                      OnItemSelected="OnAutocompleteFilter"
-                                      InputTextToUpper="true">
-                </DnetAutoCompleteList>
-                <span>@_formData.FilterValue</span>
-            </div>
-            <ValidationMessage For="@(() => _formData.FilterValue)" style="font-size: 0.675rem; color: red" />
-            <div class="d-flex dnet-m-t-15">
-                <DnetAutoCompleteList @bind-Value="@_formData1.FilterValue" class="form-control form-control-sm dnet-m-r-10" style="width: 250px"
-                                      Items="_items"
-                                      TItem="MarineOperator"
-                                      SearchValueConverter="(value) => value.Name"
-                                      CellTemplate="typeof(AutocompleteContent)"
-                                      OnItemSelected="OnAutocompleteFilter"
-                                      HasContent="true">
-                </DnetAutoCompleteList>
-                <span>@_formData1.FilterValue</span>
-            </div>
-            <ValidationMessage For="@(() => _formData1.FilterValue)" style="font-size: 0.675rem; color: red" />
-        </EditForm>
-        <DnetVirtualScrollViewport Items="_virtualScrollitems"
-                                   ItemHeight="50"
-                                   TItem="MarineOperator"
-                                   DisplayValueConverter="(value) => value.Name">
-        </DnetVirtualScrollViewport>
     </div>
 </div>
 
 
 @code {
 
-    private FilterModel _filterModel { get; set; } = new FilterModel();
 
     private List<MarineOperator> _items = new List<MarineOperator>();
 
@@ -119,17 +62,6 @@
 
     protected override void OnInitialized()
     {
-        _filterModel = new FilterModel
-        {
-            Column = "Name",
-            Value = "",
-            AdditionalValue = "",
-            Type = FilterType.Text,
-            Operator = FilterOperator.StartsWith,
-            AdditionalOperator = FilterOperator.EndsWith,
-            Condition = FilterCondition.And
-        };
-
         _items = GetAutocompleteData();
 
         _virtualScrollitems = GetVirtualScrollData();
@@ -179,39 +111,6 @@
         _dialogData = overlayDataResult.CloseReason == CloseReason.Ok ? overlayDataResult.ComponentData.ToString() : "";
 
         InvokeAsync(StateHasChanged);
-    }
-
-
-    void ShowToast()
-    {
-        var toastConfig = new ToastConfig
-        {
-            Title = "Toast title:",
-            Text = "Data save in 10 seconds",
-            HasBackdrop = false,
-            HasTransparentBackdrop = false,
-            ToastType = ToastType.Danger,
-            ToastPostion = ToastPostion.TopRight,
-            ExcutionTime = 10,
-            ShowExcutionTime = false
-        };
-
-        ToastService.Show(toastConfig);
-    }
-
-    public void ShowTooltip()
-    {
-        var tooltipConfig = new TooltipConfig()
-        {
-            Text = "Tooltip v.1.0.0 base on Blazor Overlay Library v.1.0.0. Develop by Adrian Mustelier Camino",
-            MaxHeight = "50px",
-            MaxWidth = "400px",
-            Width = "400px",
-            Height = "50px",
-            TooltipColor = "rgba(97,97,97,1)"
-        };
-
-        _tooltipReference = TooltipService.Show(tooltipConfig, _tooltipTarget);
     }
 
     public void HideTooltip()

@@ -9,16 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetOverlayComponent", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetDialogComponent", "src\DnetDialogComponent\DnetDialogComponent.csproj", "{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetConnectedPanel", "src\DnetConnectedPanel\DnetConnectedPanel.csproj", "{97A6DECC-4B65-4113-AF68-A161819214F7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetAutocompleteComponent", "src\DnetAutocompleteComponent\DnetAutocompleteComponent.csproj", "{7C497B0F-0558-49FE-B2EA-0F0B602CA32E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetToastComponent", "src\DnetToastComponent\DnetToastComponent.csproj", "{BA909F9C-FEA5-48AB-9590-D87B3412D1A4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DnetTooltip", "src\DnetTooltip\DnetTooltip.csproj", "{309EFC80-7B09-45E0-96B1-74DC94AEE018}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DnetVirtualScrolling", "src\DnetVirtualScrolling\DnetVirtualScrolling.csproj", "{08D3B1CC-7B96-49DA-AA5C-3E4A6056DE63}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,26 +27,6 @@ Global
 		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BF2E668-8B26-4A95-AB12-6A3AC05EE05F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{97A6DECC-4B65-4113-AF68-A161819214F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97A6DECC-4B65-4113-AF68-A161819214F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97A6DECC-4B65-4113-AF68-A161819214F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97A6DECC-4B65-4113-AF68-A161819214F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C497B0F-0558-49FE-B2EA-0F0B602CA32E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C497B0F-0558-49FE-B2EA-0F0B602CA32E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C497B0F-0558-49FE-B2EA-0F0B602CA32E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C497B0F-0558-49FE-B2EA-0F0B602CA32E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BA909F9C-FEA5-48AB-9590-D87B3412D1A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA909F9C-FEA5-48AB-9590-D87B3412D1A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA909F9C-FEA5-48AB-9590-D87B3412D1A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA909F9C-FEA5-48AB-9590-D87B3412D1A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{309EFC80-7B09-45E0-96B1-74DC94AEE018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{309EFC80-7B09-45E0-96B1-74DC94AEE018}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{309EFC80-7B09-45E0-96B1-74DC94AEE018}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{309EFC80-7B09-45E0-96B1-74DC94AEE018}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08D3B1CC-7B96-49DA-AA5C-3E4A6056DE63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08D3B1CC-7B96-49DA-AA5C-3E4A6056DE63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08D3B1CC-7B96-49DA-AA5C-3E4A6056DE63}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08D3B1CC-7B96-49DA-AA5C-3E4A6056DE63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

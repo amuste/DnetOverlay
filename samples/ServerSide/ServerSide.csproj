@@ -9,13 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DnetAutocompleteComponent\DnetAutocompleteComponent.csproj" />
-    <ProjectReference Include="..\..\src\DnetConnectedPanel\DnetConnectedPanel.csproj" />
     <ProjectReference Include="..\..\src\DnetDialogComponent\DnetDialogComponent.csproj" />
     <ProjectReference Include="..\..\src\DnetOverlayComponent\DnetOverlayComponent.csproj" />
-    <ProjectReference Include="..\..\src\DnetToastComponent\DnetToastComponent.csproj" />
-    <ProjectReference Include="..\..\src\DnetTooltip\DnetTooltip.csproj" />
-    <ProjectReference Include="..\..\src\DnetVirtualScrolling\DnetVirtualScrolling.csproj" />
   </ItemGroup>
 
 </Project>
